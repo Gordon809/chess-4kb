@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chess 4KB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+<style>
+body{font-family:sans-serif;text-align:center;background:#1a1a1a;color:white;margin:0;padding:10px}
+#board{width:340px;margin:15px auto}
+button{padding:10px 18px;border:0;border-radius:10px;background:#4CAF50;color:white;font-size:16px}
+#status{margin:10px;font-size:18px;font-weight:bold}
+</style>
+</head>
+<body>
+<h2>♟️ Chess 4KB</h2>
+<div id="status">Putih jalan dulu</div>
+<div id="board"></div>
+<button onclick="location.reload()">🔄 Main Lagi</button>
+<p style="font-size:12px;opacity:.6">Main berdua, 1 HP gantian</p>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script>
+var game = new Chess();
+var board = Chessboard('board', {
+  draggable: true,
+  position: 'start',
+  onDragStart: function(source, piece) {
+    if (game.game_over()) return false;
+    if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game.turn() === 'b' && piece.search(/^w/) !== -1)) return false;
+  },
+  onDrop: function(source, target) {
+    var move = game.move({from: source, to: target, promotion: 'q'});
+    if (move === null) return 'snapback';
+    update();
+  },
+  onSnapEnd: function() { board.position(game.fen()); }
+});
+function update() {
+  var s = '';
+  if (game.in_checkmate()) s = 'SKAKMAT! ' + (game.turn() === 'w' ? 'Hitam Menang!' : 'Putih Menang!');
+  else if (game.in_draw()) s = 'Seri!';
+  else s = (game.turn() === 'w' ? 'Giliran Putih' : 'Giliran Hitam') + (game.in_check() ? ' - SKAK!' : '');
+  document.getElementById('status').innerText = s;
+}
+</script>
+</body>
+</html>
